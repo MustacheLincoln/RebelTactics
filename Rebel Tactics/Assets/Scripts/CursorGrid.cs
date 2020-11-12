@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -7,19 +6,19 @@ using UnityEngine.AI;
 [RequireComponent(typeof(LineRenderer))]
 public class CursorGrid : MonoBehaviour
 {
-
     [SerializeField] Camera _camera;
-    [SerializeField] GameObject _gridTarget;
+    [SerializeField] GameObject _gridTargetIcon;
     [SerializeField] GameObject _walkingRangeIcon;
     [SerializeField] GameManager _gameManager;
 
-    Queue<GameObject> _moveIcons = new Queue<GameObject>();
+    readonly Queue<GameObject> _moveIcons = new Queue<GameObject>();
 
     LineRenderer _lineRenderer;
 
     void Start()
     {
         _lineRenderer = GetComponent<LineRenderer>();
+        _gridTargetIcon = Instantiate(_gridTargetIcon, Vector3.zero, Quaternion.Euler(90, 0, 0));
     }
 
     public IEnumerator CalculateRange(PlayerController player)
@@ -42,8 +41,7 @@ public class CursorGrid : MonoBehaviour
     {
         if (_targetPosition == new Vector3(_sourcePosition.x, _sourcePosition.y + .01f, _sourcePosition.z))
             return false;
-        NavMeshHit navMesHit;
-        if (NavMesh.SamplePosition(_targetPosition, out navMesHit, .5f, NavMesh.AllAreas))
+        if (NavMesh.SamplePosition(_targetPosition, out NavMeshHit navMesHit, .5f, NavMesh.AllAreas))
         {
             var path = new NavMeshPath();
             NavMesh.CalculatePath(_sourcePosition, navMesHit.position, NavMesh.AllAreas, path);
@@ -82,9 +80,7 @@ public class CursorGrid : MonoBehaviour
     public void CaptureCursor(PlayerController player)
     {
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit rayCastHit;
-        NavMeshHit navMeshHit;
-        if (Physics.Raycast(ray, out rayCastHit) && (NavMesh.SamplePosition(rayCastHit.point, out navMeshHit, .5f, NavMesh.AllAreas))) //Line flickers without this redundantcy
+        if (Physics.Raycast(ray, out RaycastHit rayCastHit) && (NavMesh.SamplePosition(rayCastHit.point, out NavMeshHit navMeshHit, .5f, NavMesh.AllAreas))) //Line flickers without this redundantcy
         {
             Vector3 position = Vector3Int.FloorToInt(navMeshHit.position);
             Vector3 gridCenterOffset = new Vector3(0.5f, 0.01f, 0.5f);
@@ -111,8 +107,8 @@ public class CursorGrid : MonoBehaviour
         _lineRenderer.SetPositions(corners);
         _lineRenderer.positionCount = corners.Length;
         var destination = path.corners[path.corners.Length - 1];
-        _gridTarget.SetActive(true);
-        _gridTarget.transform.position = destination;
+        _gridTargetIcon.SetActive(true);
+        _gridTargetIcon.transform.position = destination;
     }
 
     void ClearRange()
@@ -123,7 +119,7 @@ public class CursorGrid : MonoBehaviour
 
     void ClearPath()
     {
-        _gridTarget.SetActive(false);
+        _gridTargetIcon.SetActive(false);
         _lineRenderer.positionCount = 0;
     }
 }
