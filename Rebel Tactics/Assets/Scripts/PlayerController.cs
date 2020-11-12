@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     public NavMeshAgent agent;
     public NavMeshObstacle obstacle;
 
+    public bool moving;
     public bool movable;
     public int maxMoveDistance = 6;
     public int number;
@@ -21,34 +22,52 @@ public class PlayerController : MonoBehaviour
     {
         _cursorGrid = FindObjectOfType<CursorGrid>();
         _gameManager = FindObjectOfType<GameManager>();
+        for (int i = 0; i <= _gameManager.players.Length - 1; i++)
+            if (_gameManager.players[i] == this)
+                number = i;
+        agent.enabled = false;
+        obstacle.enabled = true;
+    }
+
+    public void StartTurn()
+    {
+        agent.enabled = false;
+        obstacle.enabled = false;
+        movable = true;
+        moving = false;
+        StartCoroutine(_cursorGrid.CalculateRange(this));
+    }
+
+    public void EndTurn()
+    {
+        agent.enabled = false;
+        obstacle.enabled = true;
+        _gameManager.NextTurn();
         movable = false;
-        var players = FindObjectsOfType<PlayerController>();
-        for (int i = 0; i <= players.Length - 1; i++)
-            if (players[i] == this)
-                number = i + 1;
+        moving = false;
+    }
+
+    public void Move(Vector3 destination)
+    {
+        obstacle.enabled = false;
+        agent.enabled = true;
+        agent.SetDestination(destination);
+        movable = false;
+        moving = true;
     }
 
     private void Update()
     {
-        if (_gameManager.turn != number)
-        {
-            if (movable == false)
-                if (!agent.pathPending)
-                    if (agent.remainingDistance <= agent.stoppingDistance)
-                        if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
-                        {
-                            _gameManager.NextTurn();
-                            agent.enabled = false;
-                            obstacle.enabled = true;
-                            movable = true;
-                        }
-            if (movable == true)
-                _cursorGrid.CaptureCursor(this);
-        }
+        if (moving == true)
+            if (!agent.pathPending)
+                if (agent.remainingDistance <= agent.stoppingDistance)
+                    if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                        EndTurn();
+
         if (_gameManager.turn == number)
         {
-            obstacle.enabled = false;
-            agent.enabled = true;
+            if (movable == true && moving == false)
+                _cursorGrid.CaptureCursor(this);
         }           
     }
 }

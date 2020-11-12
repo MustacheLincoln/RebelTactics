@@ -22,9 +22,10 @@ public class CursorGrid : MonoBehaviour
         _lineRenderer = GetComponent<LineRenderer>();
     }
 
-    public void CalculateRange(PlayerController player)
+    public IEnumerator CalculateRange(PlayerController player)
     {
         ClearRange();
+        yield return new WaitForSeconds(.1f);
         var pos = player.transform.position;
         var max = player.maxMoveDistance;
         for (float x = pos.x - max; x <= pos.x + max; x++)
@@ -92,10 +93,7 @@ public class CursorGrid : MonoBehaviour
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    player.obstacle.enabled = false;
-                    player.agent.enabled = true;
-                    player.agent.SetDestination(destination);
-                    player.movable = false;
+                    player.Move(destination);
                     ClearRange();
                     ClearPath();
                 }
