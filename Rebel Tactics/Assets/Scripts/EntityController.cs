@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(NavMeshObstacle))]
-public class PlayerController : MonoBehaviour
+public class EntityController : MonoBehaviour
 {
     CursorGrid _cursorGrid;
     GameManager _gameManager;
@@ -22,11 +22,14 @@ public class PlayerController : MonoBehaviour
     {
         _cursorGrid = FindObjectOfType<CursorGrid>();
         _gameManager = FindObjectOfType<GameManager>();
-        for (int i = 0; i <= _gameManager.players.Length - 1; i++)
-            if (_gameManager.players[i] == this)
+        _gameManager.GetEntities();
+        for (int i = 0; i <= _gameManager.entities.Length - 1; i++)
+            if (_gameManager.entities[i] == this)
                 number = i;
         agent.enabled = false;
         obstacle.enabled = true;
+        if (number == _gameManager.turn)
+            StartTurn();
     }
 
     public void StartTurn()

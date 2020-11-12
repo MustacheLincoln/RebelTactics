@@ -21,23 +21,23 @@ public class CursorGrid : MonoBehaviour
         _gridTargetIcon = Instantiate(_gridTargetIcon, Vector3.zero, Quaternion.Euler(90, 0, 0));
     }
 
-    public IEnumerator CalculateRange(PlayerController player)
+    public IEnumerator CalculateRange(EntityController entity)
     {
         ClearRange();
         yield return new WaitForSeconds(.1f);
-        var pos = player.transform.position;
-        var max = player.maxMoveDistance;
+        var pos = entity.transform.position;
+        var max = entity.maxMoveDistance;
         for (float x = pos.x - max; x <= pos.x + max; x++)
             for( float y = pos.y - max; y <= pos.y + max; y++)
                 for (float z = pos.z - max; z <= pos.z + max; z++)
                 {
                     Vector3 _targetPosition = new Vector3(x, y + .01f, z);
-                    if (IsSpaceFree(player, pos,_targetPosition, false))
+                    if (IsSpaceFree(entity, pos,_targetPosition, false))
                         MovementIconQueue(_targetPosition);
                 }
     }
 
-    bool IsSpaceFree(PlayerController player, Vector3 _sourcePosition, Vector3 _targetPosition, bool drawing)
+    bool IsSpaceFree(EntityController entity, Vector3 _sourcePosition, Vector3 _targetPosition, bool drawing)
     {
         if (_targetPosition == new Vector3(_sourcePosition.x, _sourcePosition.y + .01f, _sourcePosition.z))
             return false;
@@ -48,7 +48,7 @@ public class CursorGrid : MonoBehaviour
             float _pathLength = 0;
             for (int i = 1; i < path.corners.Length; ++i)
                 _pathLength += Vector3.Distance(path.corners[i - 1], path.corners[i]);
-            if (_pathLength <= player.maxMoveDistance && path.status == NavMeshPathStatus.PathComplete)
+            if (_pathLength <= entity.maxMoveDistance && path.status == NavMeshPathStatus.PathComplete)
             {
                 if (drawing)
                     DrawPath(path);
@@ -77,7 +77,7 @@ public class CursorGrid : MonoBehaviour
         }
     }
 
-    public void CaptureCursor(PlayerController player)
+    public void CaptureCursor(EntityController entity)
     {
         Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit rayCastHit) && (NavMesh.SamplePosition(rayCastHit.point, out NavMeshHit navMeshHit, .5f, NavMesh.AllAreas))) //Line flickers without this redundantcy
@@ -85,11 +85,11 @@ public class CursorGrid : MonoBehaviour
             Vector3 position = Vector3Int.FloorToInt(navMeshHit.position);
             Vector3 gridCenterOffset = new Vector3(0.5f, 0.01f, 0.5f);
             Vector3 destination = position + gridCenterOffset;
-            if (IsSpaceFree(player, player.transform.position, destination, true))
+            if (IsSpaceFree(entity, entity.transform.position, destination, true))
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    player.Move(destination);
+                    entity.Move(destination);
                     ClearRange();
                     ClearPath();
                 }

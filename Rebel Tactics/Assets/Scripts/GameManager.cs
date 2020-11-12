@@ -8,25 +8,23 @@ public class GameManager : MonoBehaviour
     [SerializeField] Text _turnText;
 
     public int turn = 0;
-    public PlayerController[] players;
+    public EntityController[] entities;
 
-    void Awake()
+    void Start()
     {
-        players = FindObjectsOfType<PlayerController>();
-    }
-
-    private void Start()
-    {
-        players[turn].StartTurn();
         _turnText.text = turn.ToString();
+    }
+    public void GetEntities()
+    {
+        entities = FindObjectsOfType<EntityController>();
     }
 
     public void NextTurn()
     {
         turn++;
-        if (turn > players.Length - 1)
+        if (turn > entities.Length - 1)
             turn = 0;
-        players[turn].StartTurn();
+        entities[turn].StartTurn();
         _turnText.text = turn.ToString();
     }
 }
