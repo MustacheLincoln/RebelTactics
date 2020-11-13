@@ -65,7 +65,7 @@ MonoBehaviour:
     i14: 0
     i15: 0
   m_ServerOnly: 0
-  m_LocalPlayerAuthority: 0
+  m_LocalPlayerAuthority: 1
 --- !u!1001 &6729279641408363752
 PrefabInstance:
   m_ObjectHideFlags: 0

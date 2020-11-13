@@ -62,15 +62,21 @@ public class EntityController : MonoBehaviour
     private void Update()
     {
         if (moving == true)
-            if (!agent.pathPending)
-                if (agent.remainingDistance <= agent.stoppingDistance)
-                    if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
-                        EndTurn();
+            if (agent.remainingDistance <= .2f)
+            {
+                transform.position = agent.destination;
+                EndTurn();
+            }
 
         if (_gameManager.turn == number)
         {
             if (movable == true && moving == false)
                 _cursorGrid.CaptureCursor(this);
         }           
+    }
+
+    void OnDisable()
+    {
+        _gameManager.GetEntities();
     }
 }

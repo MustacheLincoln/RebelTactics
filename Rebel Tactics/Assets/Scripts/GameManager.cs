@@ -5,8 +5,7 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] Text _turnText;
-
+    public Text _turnText;
     public int turn = 0;
     public EntityController[] entities;
 
@@ -17,6 +16,12 @@ public class GameManager : MonoBehaviour
     public void GetEntities()
     {
         entities = FindObjectsOfType<EntityController>();
+        if (turn > entities.Length - 1)
+        {
+            turn = 0;
+            entities[turn].StartTurn();
+            _turnText.text = turn.ToString();
+        }
     }
 
     public void NextTurn()

@@ -6,9 +6,9 @@ using UnityEngine.AI;
 [RequireComponent(typeof(LineRenderer))]
 public class CursorGrid : MonoBehaviour
 {
-    [SerializeField] Camera _camera;
+    public Camera _camera;
     [SerializeField] GameObject _gridTargetIcon;
-    [SerializeField] GameObject _walkingRangeIcon;
+    public GameObject _walkingRangeIcon;
     [SerializeField] GameManager _gameManager;
 
     readonly Queue<GameObject> _moveIcons = new Queue<GameObject>();
@@ -111,13 +111,13 @@ public class CursorGrid : MonoBehaviour
         _gridTargetIcon.transform.position = destination;
     }
 
-    void ClearRange()
+    public void ClearRange()
     {
         foreach (GameObject icon in _moveIcons)
             icon.SetActive(false);
     }
 
-    void ClearPath()
+    public void ClearPath()
     {
         _gridTargetIcon.SetActive(false);
         _lineRenderer.positionCount = 0;
